@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+#custom
+img/
+*ranges.txt
+
 # Distribution / packaging
 .Python
 build/

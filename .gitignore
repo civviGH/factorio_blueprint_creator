@@ -9,6 +9,7 @@ __pycache__/
 #custom
 img/
 *ranges.txt
+test.py
 
 # Distribution / packaging
 .Python

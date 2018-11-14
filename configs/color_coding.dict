@@ -1,0 +1,11 @@
+stone-path : (99,101,99) : tile
+concrete : (49,48,49) : tile
+concrete-black : (8,12,8) : tile
+concrete-magenta : (57,12,123) : tile
+concrete-purple : (57,12,123) : tile
+concrete-blue : (8,12,123) : tile
+concrete-cyan : (8,125,123) : tile
+concrete-green : (8,125,8) : tile
+concrete-yellow : (123,125,8) : tile
+concrete-orange : (123,60,8) : tile
+concrete-red : (123,12,8) : tile

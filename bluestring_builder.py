@@ -1,6 +1,22 @@
 import json
 import zlib
 import base64
+from colormath.color_objects import sRGBColor, LabColor
+from colormath.color_conversions import convert_color
+from colormath.color_diff import delta_e_cie2000
+
+def colorDistance(c1, c2):
+    co1 = list(c1)
+    co2 = list(c2)
+    for i in range(3):
+        co1[i] = co1[i] / 255.0
+        co2[i] = co2[i] / 255.0
+    c1_rgb = sRGBColor(co1[0], co1[1], co1[2])
+    c2_rgb = sRGBColor(co2[0], co2[1], co2[2])
+    c1_lab = convert_color(c1_rgb, LabColor)
+    c2_lab = convert_color(c2_rgb, LabColor)
+    delta_e = delta_e_cie2000(c1_lab, c2_lab)
+    return delta_e
 
 class Blueprint:
 

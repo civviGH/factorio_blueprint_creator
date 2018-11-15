@@ -36,8 +36,6 @@ def resizeImage(filename, wanted_size = 50):
     return(img_sized)
 
 def colorDistance(c1, c2):
-    #distance = math.sqrt((c1[0]-c2[0])**2 + (c1[1]-c2[1])**2 + (c1[2]-c2[2])**2)
-    # normalize
     co1 = list(c1)
     co2 = list(c2)
     for i in range(3):

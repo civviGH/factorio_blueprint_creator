@@ -2,7 +2,7 @@ from bluestring_builder import *
 import pickle
 from PIL import Image
 import sys
-from Tkinter import Tk
+from tkinter import Tk
 import math
 from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
@@ -33,6 +33,7 @@ def resizeImage(filename, wanted_size = 50):
     wpercent = (wanted_size/float(img.size[0]))
     hsize = int((float(img.size[1])*float(wpercent)))
     img_sized = img.resize((wanted_size,hsize), Image.ANTIALIAS)
+    img_sized.save("img/glu_sized.png")
     return(img_sized)
 
 def colorDistance(c1, c2):
@@ -48,57 +49,61 @@ def colorDistance(c1, c2):
     delta_e = delta_e_cie2000(c1_lab, c2_lab)
     return delta_e
 
-config_name = sys.argv[1]
-image_name = sys.argv[2]
-if len(sys.argv) > 3:
-    image_size = int(sys.argv[3])
-else:
-    image_size = 50
+def foobar():
+    config_name = sys.argv[1]
+    image_name = sys.argv[2]
+    if len(sys.argv) > 3:
+        image_size = int(sys.argv[3])
+    else:
+        image_size = 50
 
-colors = getConfig(config_name)
-img_sized = resizeImage(image_name, image_size)
-img_width = img_sized.size[0]
-img_pixels = img_sized.load()
+    colors = getConfig(config_name)
+    img_sized = resizeImage(image_name, image_size)
+    img_width = img_sized.size[0]
+    img_pixels = img_sized.load()
 
-# get background color from upper leftmost tile
-bg_color = img_pixels[0, 0][0:3]
-# emtpy dict with colors we can match
-matched_colors = {}
+    # get background color from upper leftmost tile
+    bg_color = img_pixels[0, 0][0:3]
+    # emtpy dict with colors we can match
+    matched_colors = {}
 
-print("Creating blueprint from image data...")
-bp = Blueprint()
-for x in range(img_width):
-    print("{}%".format((float(x+1)/img_width) * 100.0))
-    for y in range(img_sized.size[1]):
-        pixel_color = img_pixels[x, y][0:3]
-        if pixel_color == bg_color:
-            continue
-        if pixel_color in matched_colors:
-            rtn_code = bp.addEntity(matched_colors[pixel_color]["name"], (x,y), matched_colors[pixel_color]["type"])
-        else:
-            minimal_distance = 9999999
-            nearest_color = ""
-            for key,value in colors.iteritems():
-                distance = colorDistance(key, pixel_color)
-                if distance < minimal_distance:
-                    minimal_distance = distance
-                    nearest_color = key
-            matched_colors[nearest_color] = {}
-            matched_colors[nearest_color]["name"] = colors[nearest_color]["name"]
-            matched_colors[nearest_color]["type"] = colors[nearest_color]["type"]
-            rtn_code = bp.addEntity(colors[nearest_color]["name"], (x,y), colors[nearest_color]["type"])
-        if rtn_code != 0:
-            print(rtn_code)
-print("done")
-finished_blueprint = bp.getBlueprintString()
+    print("Creating blueprint from image data...")
+    bp = Blueprint()
+    for x in range(img_width):
+        print("{}%".format((float(x+1)/img_width) * 100.0))
+        for y in range(img_sized.size[1]):
+            pixel_color = img_pixels[x, y][0:3]
+            if pixel_color == bg_color:
+                continue
+            if pixel_color in matched_colors:
+                rtn_code = bp.addEntity(matched_colors[pixel_color]["name"], (x,y), matched_colors[pixel_color]["type"])
+            else:
+                minimal_distance = 9999999
+                nearest_color = ""
+                for key,value in colors.iteritems():
+                    distance = colorDistance(key, pixel_color)
+                    if distance < minimal_distance:
+                        minimal_distance = distance
+                        nearest_color = key
+                matched_colors[nearest_color] = {}
+                matched_colors[nearest_color]["name"] = colors[nearest_color]["name"]
+                matched_colors[nearest_color]["type"] = colors[nearest_color]["type"]
+                rtn_code = bp.addEntity(colors[nearest_color]["name"], (x,y), colors[nearest_color]["type"])
+            if rtn_code != 0:
+                print(rtn_code)
+    print("done")
+    finished_blueprint = bp.getBlueprintString()
 
-# get blueprint in clipboard
-w = Tk()
-w.withdraw()
-w.clipboard_clear()
-w.clipboard_append(finished_blueprint)
-w.update()
-w.destroy()
+    # get blueprint in clipboard
+    w = Tk()
+    w.withdraw()
+    w.clipboard_clear()
+    w.clipboard_append(finished_blueprint)
+    w.update()
+    w.destroy()
 
-with open("blueprint" , "w") as f:
-    f.write(finished_blueprint)
+    with open("blueprint" , "w") as f:
+        f.write(finished_blueprint)
+
+if __name__ == "__main__":
+    foobar()

@@ -72,6 +72,7 @@ def startCreatingBlueprint():
     img_pixels = img_resized.load()
     bg_color = img_pixels[0, 0][0:3]
     matched_colors = {}
+    check_for_bg_color = False
 
     bp = Blueprint()
     for x in range(img_width):
@@ -79,14 +80,16 @@ def startCreatingBlueprint():
         #print("{}%".format((float(x+1)/img_width) * 100.0))
         for y in range(img_resized.size[1]):
             pixel_color = img_pixels[x, y][0:3]
-            if pixel_color == bg_color:
-                continue
+            if (check_for_bg_color):
+                if pixel_color == bg_color:
+                    continue
             if pixel_color in matched_colors:
                 rtn_code = bp.addEntity(matched_colors[pixel_color]["name"], (x,y), matched_colors[pixel_color]["type"])
             else:
                 minimal_distance = 9999999
                 nearest_color = ""
                 for key,value in colors.items():
+                    #distance = naiveColorDistance(key, pixel_color)
                     distance = colorDistance(key, pixel_color)
                     if distance < minimal_distance:
                         minimal_distance = distance
@@ -110,6 +113,12 @@ def toClipboard():
     w.update()
     w.destroy()
 
+def closeApp():
+    global is_running
+    if is_running:
+        return
+    blueprint_app.stop()
+
 # basic startup
 blueprint_app.setSize(800, 600)
 blueprint_app.setTitle("Blueprint art creator")
@@ -131,7 +140,7 @@ blueprint_app.setMeterFill("progress", "green")
 blueprint_app.setPadding([10, 10])
 blueprint_app.addButtons(["Start"], startCreatingBlueprint, 10, 0)
 blueprint_app.addButtons(["to Clipboard"], toClipboard, 10, 1)
-blueprint_app.addButtons(["DEBUG"], debugging)
+blueprint_app.addButtons(["Close"], closeApp)
 
 # startup logic
 #blueprint_app.setStartFunction(fillListBox)

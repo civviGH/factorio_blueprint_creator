@@ -1,6 +1,6 @@
 from bluestring_builder import *
 import pickle
-from PIL import Image
+from PIL import Image, ImageFilter
 import sys
 from tkinter import Tk
 import math
@@ -32,8 +32,12 @@ def resizeImage(filename, wanted_size = 50):
     img = Image.open(filepath)
     wpercent = (wanted_size/float(img.size[0]))
     hsize = int((float(img.size[1])*float(wpercent)))
-    img_sized = img.resize((wanted_size,hsize), Image.ANTIALIAS)
-    img_sized.save("img/glu_sized.png")
+    img_sized = img.resize((wanted_size,hsize), Image.LANCZOS)
+    #
+    img_sized = img_sized.filter(ImageFilter.MedianFilter)
+    #
+    #img_sized = img.resize((wanted_size,hsize), Image.ANTIALIAS)
+    img_sized.save("img/glu_sized.png", quality=100)
     return(img_sized)
 
 def colorDistance(c1, c2):
@@ -48,6 +52,18 @@ def colorDistance(c1, c2):
     c2_lab = convert_color(c2_rgb, LabColor)
     delta_e = delta_e_cie2000(c1_lab, c2_lab)
     return delta_e
+
+def naiveColorDistance(c1, c2):
+    distance = math.sqrt((c1[0]-c2[0])**2+(c1[1]-c2[1])**2+(c1[2]-c2[2])**2)
+    return distance
+
+def tintedColorDistance(c1, c2):
+    co2 = list(c2)
+    for i in range(3):
+        co2[i] = (co2[i] + 255)/2
+    co2 = tuple(c2)
+    distance = math.sqrt((c1[0]-c2[0])**2+(c1[1]-c2[1])**2+(c1[2]-c2[2])**2)
+    return distance
 
 def foobar():
     config_name = sys.argv[1]
